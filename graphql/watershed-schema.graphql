@@ -1,0 +1,1030 @@
+"""
+Watershed GraphQL API Schema
+Enterprise climate platform for measuring, reducing, and reporting carbon emissions.
+Covers footprint data ingestion, emission factor lookups, Scope 1/2/3 calculations,
+supplier data requests, and climate reporting (GHG Protocol, CDP, TCFD).
+"""
+
+# ─── Scalars ──────────────────────────────────────────────────────────────────
+
+scalar DateTime
+scalar Date
+scalar JSON
+scalar Float
+scalar BigDecimal
+scalar URI
+
+# ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum EmissionScope {
+  SCOPE_1
+  SCOPE_2_LOCATION_BASED
+  SCOPE_2_MARKET_BASED
+  SCOPE_3
+}
+
+enum Scope3Category {
+  PURCHASED_GOODS_AND_SERVICES
+  CAPITAL_GOODS
+  FUEL_AND_ENERGY_RELATED_ACTIVITIES
+  UPSTREAM_TRANSPORTATION_AND_DISTRIBUTION
+  WASTE_GENERATED_IN_OPERATIONS
+  BUSINESS_TRAVEL
+  EMPLOYEE_COMMUTING
+  UPSTREAM_LEASED_ASSETS
+  DOWNSTREAM_TRANSPORTATION_AND_DISTRIBUTION
+  PROCESSING_OF_SOLD_PRODUCTS
+  USE_OF_SOLD_PRODUCTS
+  END_OF_LIFE_TREATMENT_OF_SOLD_PRODUCTS
+  DOWNSTREAM_LEASED_ASSETS
+  FRANCHISES
+  INVESTMENTS
+}
+
+enum ActivityType {
+  ELECTRICITY
+  NATURAL_GAS
+  DIESEL
+  GASOLINE
+  PROPANE
+  STEAM
+  CHILLED_WATER
+  BUSINESS_TRAVEL_AIR
+  BUSINESS_TRAVEL_RAIL
+  BUSINESS_TRAVEL_HOTEL
+  EMPLOYEE_COMMUTE
+  PURCHASED_GOODS
+  LOGISTICS
+  WASTE
+  WATER
+  REFRIGERANTS
+  CLOUD_COMPUTE
+  SUPPLY_CHAIN
+  FUEL_COMBUSTION
+}
+
+enum ActivityStatus {
+  PENDING
+  PROCESSING
+  CALCULATED
+  FAILED
+  ARCHIVED
+}
+
+enum ReportingFramework {
+  GHG_PROTOCOL
+  CDP
+  TCFD
+  CSRD
+  SEC_CLIMATE_RULE
+  SBTI
+  TNFD
+  ISO_14064
+  GRI
+  CUSTOM
+}
+
+enum MeasurementApproach {
+  SPEND_BASED
+  AVERAGE_DATA
+  SUPPLIER_SPECIFIC
+  PHYSICAL_UNIT
+  HYBRID
+}
+
+enum SupplierRequestStatus {
+  DRAFT
+  SENT
+  VIEWED
+  IN_PROGRESS
+  SUBMITTED
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum EmissionFactorSource {
+  WATERSHED
+  EPA
+  DEFRA
+  ECOINVENT
+  IEA
+  IPCC
+  GHG_PROTOCOL
+  SUPPLIER_PROVIDED
+  CUSTOM
+}
+
+enum Unit {
+  KWH
+  MWH
+  THERM
+  MMBTU
+  GALLONS
+  LITERS
+  KG
+  TONNES
+  METRIC_TONS_CO2E
+  KG_CO2E
+  MILES
+  KILOMETERS
+  NIGHTS
+  USD
+  PERCENTAGE
+  COUNT
+  SQUARE_FEET
+  SQUARE_METERS
+}
+
+enum ReportStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum DisclosureTarget {
+  CDP
+  TCFD
+  SEC
+  CSRD
+  SBTI
+  GRI
+  INTERNAL
+}
+
+enum FootprintPeriodType {
+  ANNUAL
+  QUARTERLY
+  MONTHLY
+  CUSTOM
+}
+
+enum CurrencyCode {
+  USD
+  EUR
+  GBP
+  CAD
+  AUD
+  JPY
+  CHF
+  SEK
+  NOK
+  DKK
+}
+
+enum DataQualityScore {
+  HIGH
+  MEDIUM
+  LOW
+  ESTIMATED
+}
+
+enum BusinessTravelClass {
+  ECONOMY
+  PREMIUM_ECONOMY
+  BUSINESS
+  FIRST
+}
+
+enum TransportMode {
+  AIR
+  RAIL
+  ROAD
+  SEA
+  PIPELINE
+}
+
+enum WasteDisposalMethod {
+  LANDFILL
+  RECYCLING
+  COMPOSTING
+  INCINERATION_WITH_ENERGY_RECOVERY
+  INCINERATION_WITHOUT_ENERGY_RECOVERY
+  WASTEWATER_TREATMENT
+  HAZARDOUS_WASTE_TREATMENT
+}
+
+enum SortOrder {
+  ASC
+  DESC
+}
+
+enum PermissionLevel {
+  READ
+  WRITE
+  ADMIN
+}
+
+enum IntegrationStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+  PENDING_SETUP
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+# ─── Core Types ───────────────────────────────────────────────────────────────
+
+type Organization {
+  id: ID!
+  name: String!
+  slug: String!
+  industry: String
+  employeeCount: Int
+  revenueUSD: BigDecimal
+  headquartersCountry: String
+  fiscalYearEndMonth: Int
+  reportingCurrency: CurrencyCode!
+  apiKeys: [ApiKey!]!
+  footprints(filter: FootprintFilter): FootprintConnection!
+  suppliers: SupplierConnection!
+  facilities: [Facility!]!
+  users: [User!]!
+  integrations: [Integration!]!
+  reportingGoals: [ReportingGoal!]!
+  decarbonizationTargets: [DecarbonizationTarget!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ApiKey {
+  id: ID!
+  name: String!
+  prefix: String!
+  scopes: [String!]!
+  lastUsedAt: DateTime
+  expiresAt: DateTime
+  createdAt: DateTime!
+  createdBy: User!
+}
+
+type User {
+  id: ID!
+  email: String!
+  firstName: String
+  lastName: String
+  fullName: String!
+  role: String!
+  permissionLevel: PermissionLevel!
+  organization: Organization!
+  createdAt: DateTime!
+  lastLoginAt: DateTime
+}
+
+type Facility {
+  id: ID!
+  name: String!
+  address: Address
+  country: String!
+  region: String
+  facilityType: String
+  squareFootage: Float
+  occupancyPercent: Float
+  activities: ActivityConnection!
+  footprint: EmissionsFootprint
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Address {
+  street1: String
+  street2: String
+  city: String
+  stateProvince: String
+  postalCode: String
+  country: String!
+}
+
+type ActivityData {
+  id: ID!
+  organization: Organization!
+  facility: Facility
+  activityType: ActivityType!
+  scope: EmissionScope!
+  scope3Category: Scope3Category
+  description: String
+  quantity: Float!
+  unit: Unit!
+  startDate: Date!
+  endDate: Date!
+  vendorName: String
+  costUSD: BigDecimal
+  dataQuality: DataQualityScore!
+  measurementApproach: MeasurementApproach!
+  status: ActivityStatus!
+  emissionFactor: EmissionFactor
+  calculatedEmissions: EmissionsResult
+  metadata: JSON
+  uploadedBy: User
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ActivityConnection {
+  nodes: [ActivityData!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type EmissionFactor {
+  id: ID!
+  name: String!
+  description: String
+  value: Float!
+  unit: Unit!
+  kgCO2ePerUnit: Float!
+  co2Factor: Float
+  ch4Factor: Float
+  n2oFactor: Float
+  scope: EmissionScope!
+  activityType: ActivityType
+  source: EmissionFactorSource!
+  sourceYear: Int!
+  region: String
+  country: String
+  sector: String
+  subsector: String
+  vintage: Int
+  uncertainty: Float
+  dataQuality: DataQualityScore!
+  tags: [String!]!
+  validFrom: Date!
+  validTo: Date
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type EmissionFactorConnection {
+  nodes: [EmissionFactor!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type EmissionsResult {
+  kgCO2e: Float!
+  tCO2e: Float!
+  co2Kg: Float
+  ch4Kg: Float
+  n2oKg: Float
+  emissionFactor: EmissionFactor
+  approach: MeasurementApproach!
+  calculatedAt: DateTime!
+  confidence: Float
+}
+
+type EmissionsFootprint {
+  id: ID!
+  organization: Organization!
+  period: ReportingPeriod!
+  periodType: FootprintPeriodType!
+  scope1: ScopeEmissions!
+  scope2LocationBased: ScopeEmissions!
+  scope2MarketBased: ScopeEmissions!
+  scope3: Scope3Emissions!
+  totalMarketBased: Float!
+  totalLocationBased: Float!
+  intensityMetrics: [IntensityMetric!]!
+  dataCompleteness: Float!
+  status: ActivityStatus!
+  verifiedAt: DateTime
+  verifiedBy: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type FootprintConnection {
+  nodes: [EmissionsFootprint!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type ScopeEmissions {
+  tCO2e: Float!
+  percentOfTotal: Float
+  breakdown: [EmissionBreakdownItem!]!
+  year_over_year_change: Float
+}
+
+type Scope3Emissions {
+  tCO2e: Float!
+  percentOfTotal: Float
+  categories: [Scope3CategoryEmissions!]!
+}
+
+type Scope3CategoryEmissions {
+  category: Scope3Category!
+  tCO2e: Float!
+  percentOfScope3: Float
+  dataQuality: DataQualityScore!
+}
+
+type EmissionBreakdownItem {
+  label: String!
+  activityType: ActivityType
+  tCO2e: Float!
+  percentOfScope: Float
+}
+
+type IntensityMetric {
+  id: ID!
+  name: String!
+  value: Float!
+  unit: String!
+  numerator: Float!
+  denominator: Float!
+  denominatorUnit: String!
+}
+
+type ReportingPeriod {
+  startDate: Date!
+  endDate: Date!
+  year: Int!
+  quarter: Int
+  month: Int
+}
+
+type Supplier {
+  id: ID!
+  organization: Organization!
+  name: String!
+  externalId: String
+  tier: Int
+  industry: String
+  country: String
+  annualSpendUSD: BigDecimal
+  emissionsCategory: String
+  contactEmail: String
+  contactName: String
+  dataRequests: [SupplierDataRequest!]!
+  emissionsData: [SupplierEmissionsData!]!
+  engagementScore: Float
+  tags: [String!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type SupplierConnection {
+  nodes: [Supplier!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type SupplierDataRequest {
+  id: ID!
+  supplier: Supplier!
+  requestedBy: User!
+  status: SupplierRequestStatus!
+  reportingYear: Int!
+  dueDate: Date
+  sentAt: DateTime
+  submittedAt: DateTime
+  questionnaire: JSON
+  response: JSON
+  notes: String
+  remindersSent: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type SupplierEmissionsData {
+  id: ID!
+  supplier: Supplier!
+  reportingYear: Int!
+  scope1TonnesCO2e: Float
+  scope2TonnesCO2e: Float
+  scope3TonnesCO2e: Float
+  totalTonnesCO2e: Float
+  revenueUSD: BigDecimal
+  dataSource: String
+  verified: Boolean!
+  verificationBody: String
+  submittedAt: DateTime!
+  createdAt: DateTime!
+}
+
+type ClimateReport {
+  id: ID!
+  organization: Organization!
+  name: String!
+  framework: ReportingFramework!
+  disclosureTarget: DisclosureTarget
+  reportingPeriod: ReportingPeriod!
+  status: ReportStatus!
+  footprint: EmissionsFootprint
+  sections: [ReportSection!]!
+  attestedBy: User
+  attestedAt: DateTime
+  publishedAt: DateTime
+  submittedExternallyAt: DateTime
+  externalSubmissionId: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ReportSection {
+  id: ID!
+  title: String!
+  sectionCode: String
+  content: String
+  dataPoints: [ReportDataPoint!]!
+  completionPercent: Float!
+  isRequired: Boolean!
+}
+
+type ReportDataPoint {
+  id: ID!
+  label: String!
+  value: String
+  unit: String
+  source: String
+  footnote: String
+}
+
+type DecarbonizationTarget {
+  id: ID!
+  organization: Organization!
+  name: String!
+  framework: String
+  baselineYear: Int!
+  targetYear: Int!
+  baselineTonnesCO2e: Float!
+  targetReductionPercent: Float!
+  targetTonnesCO2e: Float!
+  scope: EmissionScope
+  validated: Boolean!
+  validatedBy: String
+  validatedAt: DateTime
+  initiatives: [DecarbonizationInitiative!]!
+  progress: TargetProgress
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type TargetProgress {
+  currentTonnesCO2e: Float!
+  reductionAchievedPercent: Float!
+  onTrack: Boolean!
+  projectedCompletionYear: Int
+  lastCalculatedAt: DateTime!
+}
+
+type DecarbonizationInitiative {
+  id: ID!
+  name: String!
+  description: String
+  category: String!
+  estimatedAnnualReductionTonnesCO2e: Float
+  estimatedCostUSD: BigDecimal
+  implementationYear: Int
+  status: String!
+  scope: EmissionScope
+  tags: [String!]!
+}
+
+type ReportingGoal {
+  id: ID!
+  organization: Organization!
+  framework: ReportingFramework!
+  targetYear: Int!
+  description: String
+  isActive: Boolean!
+  createdAt: DateTime!
+}
+
+type Integration {
+  id: ID!
+  organization: Organization!
+  name: String!
+  provider: String!
+  status: IntegrationStatus!
+  lastSyncAt: DateTime
+  nextSyncAt: DateTime
+  recordsSynced: Int
+  errorMessage: String
+  config: JSON
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Alert {
+  id: ID!
+  organization: Organization!
+  severity: AlertSeverity!
+  title: String!
+  message: String!
+  isRead: Boolean!
+  relatedEntityType: String
+  relatedEntityId: ID
+  createdAt: DateTime!
+}
+
+type AuditLog {
+  id: ID!
+  organization: Organization!
+  user: User
+  action: String!
+  entityType: String!
+  entityId: ID!
+  changes: JSON
+  ipAddress: String
+  userAgent: String
+  createdAt: DateTime!
+}
+
+type AuditLogConnection {
+  nodes: [AuditLog!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type EmissionFactorSearchResult {
+  emissionFactor: EmissionFactor!
+  relevanceScore: Float!
+  matchedFields: [String!]!
+}
+
+type BulkUploadJob {
+  id: ID!
+  organization: Organization!
+  status: ActivityStatus!
+  fileName: String!
+  totalRows: Int!
+  processedRows: Int!
+  successRows: Int!
+  errorRows: Int!
+  errors: [BulkUploadError!]!
+  uploadedBy: User!
+  startedAt: DateTime
+  completedAt: DateTime
+  createdAt: DateTime!
+}
+
+type BulkUploadError {
+  row: Int!
+  field: String
+  message: String!
+  rawValue: String
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+  totalPages: Int!
+}
+
+type ElectricityGridData {
+  id: ID!
+  country: String!
+  region: String
+  gridName: String!
+  year: Int!
+  locationBasedFactorKgCO2ePerKwh: Float!
+  marketBasedFactorKgCO2ePerKwh: Float
+  renewablePercent: Float
+  source: String!
+  updatedAt: DateTime!
+}
+
+type RenewableEnergyCertificate {
+  id: ID!
+  organization: Organization!
+  certificateType: String!
+  quantity: Float!
+  unit: Unit!
+  vintageYear: Int!
+  country: String!
+  generatorName: String
+  registryId: String
+  retiredAt: DateTime
+  createdAt: DateTime!
+}
+
+type CarbonOffset {
+  id: ID!
+  organization: Organization!
+  projectName: String!
+  projectType: String!
+  standard: String
+  quantity: Float!
+  vintageYear: Int!
+  country: String
+  retiredAt: DateTime
+  registryUrl: URI
+  costPerTonne: Float
+  totalCostUSD: BigDecimal
+  createdAt: DateTime!
+}
+
+# ─── Input Types ──────────────────────────────────────────────────────────────
+
+input FootprintFilter {
+  year: Int
+  periodType: FootprintPeriodType
+  startDate: Date
+  endDate: Date
+}
+
+input ActivityFilter {
+  activityTypes: [ActivityType!]
+  scopes: [EmissionScope!]
+  scope3Categories: [Scope3Category!]
+  facilityIds: [ID!]
+  startDate: Date
+  endDate: Date
+  status: ActivityStatus
+  dataQuality: DataQualityScore
+}
+
+input EmissionFactorFilter {
+  activityTypes: [ActivityType!]
+  scopes: [EmissionScope!]
+  sources: [EmissionFactorSource!]
+  regions: [String!]
+  countries: [String!]
+  vintageYears: [Int!]
+  searchQuery: String
+}
+
+input SupplierFilter {
+  tier: Int
+  industries: [String!]
+  countries: [String!]
+  hasSubmittedData: Boolean
+  requestStatus: SupplierRequestStatus
+}
+
+input PaginationInput {
+  first: Int
+  after: String
+  last: Int
+  before: String
+}
+
+input SortInput {
+  field: String!
+  order: SortOrder!
+}
+
+input CreateActivityDataInput {
+  facilityId: ID
+  activityType: ActivityType!
+  scope: EmissionScope!
+  scope3Category: Scope3Category
+  description: String
+  quantity: Float!
+  unit: Unit!
+  startDate: Date!
+  endDate: Date!
+  vendorName: String
+  costUSD: BigDecimal
+  measurementApproach: MeasurementApproach!
+  metadata: JSON
+}
+
+input UpdateActivityDataInput {
+  facilityId: ID
+  description: String
+  quantity: Float
+  unit: Unit
+  startDate: Date
+  endDate: Date
+  vendorName: String
+  costUSD: BigDecimal
+  measurementApproach: MeasurementApproach
+  metadata: JSON
+}
+
+input CreateSupplierInput {
+  name: String!
+  externalId: String
+  tier: Int
+  industry: String
+  country: String
+  annualSpendUSD: BigDecimal
+  contactEmail: String
+  contactName: String
+  tags: [String!]
+}
+
+input CreateSupplierDataRequestInput {
+  supplierId: ID!
+  reportingYear: Int!
+  dueDate: Date
+  questionnaire: JSON
+  notes: String
+}
+
+input CreateFacilityInput {
+  name: String!
+  address: AddressInput
+  country: String!
+  region: String
+  facilityType: String
+  squareFootage: Float
+  occupancyPercent: Float
+}
+
+input AddressInput {
+  street1: String
+  street2: String
+  city: String
+  stateProvince: String
+  postalCode: String
+  country: String!
+}
+
+input CreateReportInput {
+  name: String!
+  framework: ReportingFramework!
+  disclosureTarget: DisclosureTarget
+  reportingYear: Int!
+  startDate: Date
+  endDate: Date
+}
+
+input CreateDecarbonizationTargetInput {
+  name: String!
+  framework: String
+  baselineYear: Int!
+  targetYear: Int!
+  targetReductionPercent: Float!
+  scope: EmissionScope
+}
+
+input CreateCarbonOffsetInput {
+  projectName: String!
+  projectType: String!
+  standard: String
+  quantity: Float!
+  vintageYear: Int!
+  country: String
+  registryUrl: URI
+  costPerTonne: Float
+}
+
+input BulkActivityUploadInput {
+  fileName: String!
+  fileContent: String!
+  mimeType: String!
+  startDate: Date!
+  endDate: Date!
+  facilityId: ID
+}
+
+input EmissionFactorLookupInput {
+  activityType: ActivityType!
+  quantity: Float!
+  unit: Unit!
+  country: String
+  region: String
+  year: Int
+}
+
+# ─── Query Root ───────────────────────────────────────────────────────────────
+
+type Query {
+  organization: Organization!
+
+  # Activity data
+  activityData(id: ID!): ActivityData
+  activityDataList(
+    filter: ActivityFilter
+    pagination: PaginationInput
+    sort: SortInput
+  ): ActivityConnection!
+
+  # Emission factors
+  emissionFactor(id: ID!): EmissionFactor
+  emissionFactors(
+    filter: EmissionFactorFilter
+    pagination: PaginationInput
+  ): EmissionFactorConnection!
+  emissionFactorSearch(query: String!, limit: Int): [EmissionFactorSearchResult!]!
+  calculateEmissions(input: EmissionFactorLookupInput!): EmissionsResult!
+
+  # Footprints
+  footprint(id: ID!): EmissionsFootprint
+  footprints(
+    filter: FootprintFilter
+    pagination: PaginationInput
+  ): FootprintConnection!
+  latestFootprint: EmissionsFootprint
+
+  # Suppliers
+  supplier(id: ID!): Supplier
+  suppliers(
+    filter: SupplierFilter
+    pagination: PaginationInput
+    sort: SortInput
+  ): SupplierConnection!
+  supplierDataRequest(id: ID!): SupplierDataRequest
+
+  # Facilities
+  facility(id: ID!): Facility
+  facilities: [Facility!]!
+
+  # Reports
+  report(id: ID!): ClimateReport
+  reports(
+    framework: ReportingFramework
+    status: ReportStatus
+    pagination: PaginationInput
+  ): [ClimateReport!]!
+
+  # Decarbonization
+  decarbonizationTarget(id: ID!): DecarbonizationTarget
+  decarbonizationTargets: [DecarbonizationTarget!]!
+
+  # Reference data
+  electricityGridData(country: String!, region: String, year: Int): ElectricityGridData
+  renewableEnergyCertificates: [RenewableEnergyCertificate!]!
+  carbonOffsets: [CarbonOffset!]!
+
+  # Integrations
+  integrations: [Integration!]!
+  integration(id: ID!): Integration
+
+  # Admin
+  apiKeys: [ApiKey!]!
+  alerts(isRead: Boolean): [Alert!]!
+  auditLogs(
+    entityType: String
+    entityId: ID
+    pagination: PaginationInput
+  ): AuditLogConnection!
+  bulkUploadJob(id: ID!): BulkUploadJob
+}
+
+# ─── Mutation Root ────────────────────────────────────────────────────────────
+
+type Mutation {
+  # Activity data
+  createActivityData(input: CreateActivityDataInput!): ActivityData!
+  updateActivityData(id: ID!, input: UpdateActivityDataInput!): ActivityData!
+  deleteActivityData(id: ID!): Boolean!
+  bulkUploadActivityData(input: BulkActivityUploadInput!): BulkUploadJob!
+
+  # Facilities
+  createFacility(input: CreateFacilityInput!): Facility!
+  updateFacility(id: ID!, input: CreateFacilityInput!): Facility!
+  deleteFacility(id: ID!): Boolean!
+
+  # Suppliers
+  createSupplier(input: CreateSupplierInput!): Supplier!
+  updateSupplier(id: ID!, input: CreateSupplierInput!): Supplier!
+  deleteSupplier(id: ID!): Boolean!
+  sendSupplierDataRequest(input: CreateSupplierDataRequestInput!): SupplierDataRequest!
+  resendSupplierDataRequest(id: ID!): SupplierDataRequest!
+  acceptSupplierDataResponse(requestId: ID!): SupplierDataRequest!
+
+  # Reports
+  createReport(input: CreateReportInput!): ClimateReport!
+  updateReportSection(reportId: ID!, sectionId: ID!, content: String!): ReportSection!
+  submitReport(id: ID!): ClimateReport!
+  publishReport(id: ID!): ClimateReport!
+
+  # Decarbonization
+  createDecarbonizationTarget(input: CreateDecarbonizationTargetInput!): DecarbonizationTarget!
+  updateDecarbonizationTarget(id: ID!, input: CreateDecarbonizationTargetInput!): DecarbonizationTarget!
+
+  # Carbon offsets & RECs
+  createCarbonOffset(input: CreateCarbonOffsetInput!): CarbonOffset!
+  retireCarbonOffset(id: ID!): CarbonOffset!
+
+  # API keys
+  createApiKey(name: String!, scopes: [String!]!): ApiKeyWithSecret!
+  revokeApiKey(id: ID!): Boolean!
+
+  # Integrations
+  triggerIntegrationSync(id: ID!): Integration!
+  disableIntegration(id: ID!): Integration!
+
+  # Alerts
+  markAlertRead(id: ID!): Alert!
+  markAllAlertsRead: Boolean!
+}
+
+type ApiKeyWithSecret {
+  apiKey: ApiKey!
+  secret: String!
+}
+
+# ─── Subscription Root ────────────────────────────────────────────────────────
+
+type Subscription {
+  footprintCalculated(organizationId: ID!): EmissionsFootprint!
+  bulkUploadProgress(jobId: ID!): BulkUploadJob!
+  supplierDataRequestUpdated(supplierId: ID): SupplierDataRequest!
+  alertCreated(organizationId: ID!): Alert!
+  integrationSyncCompleted(integrationId: ID!): Integration!
+}

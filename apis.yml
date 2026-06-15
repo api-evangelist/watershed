@@ -1,129 +1,156 @@
 aid: watershed
 name: Watershed
-description: |
-  Watershed is an enterprise sustainability platform used by large companies to
+description: 'Watershed is an enterprise sustainability platform used by large companies
+  to
+
   measure their carbon footprint, report against regulatory and voluntary
+
   frameworks, and act on decarbonization opportunities. The platform combines a
+
   library of 500,000+ emissions factors, pre-verified methodologies, and AI
+
   agents for data cleaning, analysis, and report drafting. Watershed exposes an
+
   API for automated data ingestion and reporting, alongside guided uploads, and
+
   publishes integrations for common enterprise data sources. API keys are
+
   provisioned to customers via the Watershed dashboard at
+
   dashboard.watershedclimate.com. Public developer documentation is limited;
+
   most API access is delivered through customer onboarding and partner
+
   enablement.
+
+  '
 type: Index
 position: Provider
 access: 3rd-Party
 image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
 tags:
-  - Climate
-  - Carbon Accounting
-  - ESG
-  - Sustainability
-  - Disclosure
-  - CSRD
-  - SBTi
-  - Decarbonization
-  - Scope 3
-  - Enterprise
-  - Reporting
+- Climate
+- Carbon Accounting
+- ESG
+- Sustainability
+- Disclosure
+- CSRD
+- SBTi
+- Decarbonization
+- Scope 3
+- Enterprise
+- Reporting
 url: https://raw.githubusercontent.com/api-evangelist/watershed/refs/heads/main/apis.yml
 created: '2026-05-23'
 modified: '2026-05-23'
 specificationVersion: '0.20'
 apis:
-  - aid: watershed:platform-api
-    name: Watershed Platform API
-    description: |
-      The Watershed Platform API enables programmatic ingestion of activity data,
-      retrieval of computed emissions footprints, and integration with reporting
-      and decarbonization workflows. API keys are managed in the customer's
-      Watershed dashboard under Organization Settings. Public, self-service
-      developer documentation is limited; detailed reference materials are made
-      available to customers and integration partners during onboarding.
-    humanURL: https://watershed.com/
-    tags:
-      - Carbon Data
-      - Emissions
-      - Ingestion
-      - Reporting
-      - Footprints
-      - Enterprise API
-    properties:
-      - type: Website
-        url: https://watershed.com/
-      - type: Platform
-        url: https://watershed.com/platform
-      - type: Dashboard
-        url: https://dashboard.watershedclimate.com/
-      - type: SampleCode
-        url: https://github.com/watershed-climate/python-api-training
-      - type: APITrackerProfile
-        url: https://apitracker.io/a/watershedclimate
-      - type: Marketplace
-        url: https://watershed.com/marketplace
-    features:
-      - name: Activity Data Ingestion
-        description: Push activity data (utilities, travel, spend, cloud, supply chain) into Watershed via API.
-      - name: Emissions Calculation
-        description: Apply Watershed's library of 500,000+ emissions factors and pre-verified methodologies.
-      - name: Footprint Retrieval
-        description: Read computed Scope 1, 2, and 3 footprints at organizational and granular levels.
-      - name: AI Agents
-        description: Purpose-built agents for data cleaning, analysis, and report drafting.
-      - name: Disclosure Reporting
-        description: Accelerate ESG reporting across CSRD, SEC, CDP, TCFD, and SBTi frameworks.
-      - name: Marketplace Access
-        description: Surface carbon removal and clean energy procurement opportunities.
-      - name: Dashboard API Key Management
-        description: Provision and rotate API keys directly in the Watershed dashboard.
-    useCases:
-      - name: ERP and Spend Data Sync
-        description: Automate transfer of financial and procurement data from ERP systems into Watershed.
-      - name: Cloud Footprint Tracking
-        description: Stream cloud usage and AI workload emissions into the platform.
-      - name: Supply Chain Surveys
-        description: Programmatically distribute and ingest supplier emissions data.
-      - name: Regulatory Filing Prep
-        description: Pull computed footprints into internal disclosure pipelines.
-      - name: Internal Dashboards
-        description: Power internal sustainability dashboards from authoritative Watershed data.
-    integrations:
-      - name: AWS
-      - name: Snowflake
-      - name: NetSuite
-      - name: SAP
-      - name: Workday
-      - name: Salesforce
-      - name: Coupa
-      - name: Concur
-      - name: Workiva
-      - name: Google Workspace
-    authentication:
-      - type: APIKey
-        description: API keys generated in the Watershed dashboard under Organization Settings.
-common:
+- aid: watershed:platform-api
+  name: Watershed Platform API
+  description: 'The Watershed Platform API enables programmatic ingestion of activity
+    data,
+
+    retrieval of computed emissions footprints, and integration with reporting
+
+    and decarbonization workflows. API keys are managed in the customer''s
+
+    Watershed dashboard under Organization Settings. Public, self-service
+
+    developer documentation is limited; detailed reference materials are made
+
+    available to customers and integration partners during onboarding.
+
+    '
+  humanURL: https://watershed.com/
+  tags:
+  - Carbon Data
+  - Emissions
+  - Ingestion
+  - Reporting
+  - Footprints
+  - Enterprise API
+  properties:
   - type: Website
     url: https://watershed.com/
   - type: Platform
     url: https://watershed.com/platform
-  - type: Industries
-    url: https://watershed.com/industry/technology
-  - type: Customers
-    url: https://watershed.com/customers
-  - type: Marketplace
-    url: https://watershed.com/marketplace
-  - type: Blog
-    url: https://watershed.com/blog
-  - type: Careers
-    url: https://watershed.com/careers
   - type: Dashboard
     url: https://dashboard.watershedclimate.com/
-  - type: LinkedIn
-    url: https://www.linkedin.com/company/watershed-climate/
-  - type: GitHub
-    url: https://github.com/watershed-climate
+  - type: SampleCode
+    url: https://github.com/watershed-climate/python-api-training
+  - type: APITrackerProfile
+    url: https://apitracker.io/a/watershedclimate
+  - type: Marketplace
+    url: https://watershed.com/marketplace
+  - url: graphql/watershed-graphql.md
+    type: GraphQL
+  features:
+  - name: Activity Data Ingestion
+    description: Push activity data (utilities, travel, spend, cloud, supply chain)
+      into Watershed via API.
+  - name: Emissions Calculation
+    description: Apply Watershed's library of 500,000+ emissions factors and pre-verified
+      methodologies.
+  - name: Footprint Retrieval
+    description: Read computed Scope 1, 2, and 3 footprints at organizational and
+      granular levels.
+  - name: AI Agents
+    description: Purpose-built agents for data cleaning, analysis, and report drafting.
+  - name: Disclosure Reporting
+    description: Accelerate ESG reporting across CSRD, SEC, CDP, TCFD, and SBTi frameworks.
+  - name: Marketplace Access
+    description: Surface carbon removal and clean energy procurement opportunities.
+  - name: Dashboard API Key Management
+    description: Provision and rotate API keys directly in the Watershed dashboard.
+  useCases:
+  - name: ERP and Spend Data Sync
+    description: Automate transfer of financial and procurement data from ERP systems
+      into Watershed.
+  - name: Cloud Footprint Tracking
+    description: Stream cloud usage and AI workload emissions into the platform.
+  - name: Supply Chain Surveys
+    description: Programmatically distribute and ingest supplier emissions data.
+  - name: Regulatory Filing Prep
+    description: Pull computed footprints into internal disclosure pipelines.
+  - name: Internal Dashboards
+    description: Power internal sustainability dashboards from authoritative Watershed
+      data.
+  integrations:
+  - name: AWS
+  - name: Snowflake
+  - name: NetSuite
+  - name: SAP
+  - name: Workday
+  - name: Salesforce
+  - name: Coupa
+  - name: Concur
+  - name: Workiva
+  - name: Google Workspace
+  authentication:
+  - type: APIKey
+    description: API keys generated in the Watershed dashboard under Organization
+      Settings.
+common:
+- type: Website
+  url: https://watershed.com/
+- type: Platform
+  url: https://watershed.com/platform
+- type: Industries
+  url: https://watershed.com/industry/technology
+- type: Customers
+  url: https://watershed.com/customers
+- type: Marketplace
+  url: https://watershed.com/marketplace
+- type: Blog
+  url: https://watershed.com/blog
+- type: Careers
+  url: https://watershed.com/careers
+- type: Dashboard
+  url: https://dashboard.watershedclimate.com/
+- type: LinkedIn
+  url: https://www.linkedin.com/company/watershed-climate/
+- type: GitHub
+  url: https://github.com/watershed-climate
 maintainers:
-  - FN: Kin Lane
-    email: kin@apievangelist.com
+- FN: Kin Lane
+  email: kin@apievangelist.com
