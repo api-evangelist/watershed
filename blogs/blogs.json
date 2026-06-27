@@ -3,16 +3,12 @@
   "feeds": [
     {
       "source": "https://watershed.com/blog",
-      "feed_url": "https://watershed.com/blog",
-      "title": "",
-      "saved": 0,
-      "method": "none"
-    },
-    {
-      "source": "https://watershed.com/marketplace",
-      "error": "HTTPError"
+      "feed_url": "",
+      "saved": 5,
+      "method": "agent-scrape"
     }
   ],
-  "post_count": 2,
-  "fetched": "2026-06-14T20:42:17Z"
+  "fetched": "2026-06-27T13:21:06Z",
+  "post_count": 10,
+  "agent_pulled": "2026-06-27"
 }
