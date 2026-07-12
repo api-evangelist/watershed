@@ -131,6 +131,10 @@ apis:
     description: API keys generated in the Watershed dashboard under Organization
       Settings.
 common:
+- type: VulnerabilityDisclosure
+  url: security/watershed-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/watershed-domain-security.yml
 - type: Website
   url: https://watershed.com/
 - type: Platform
