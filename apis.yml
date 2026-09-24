@@ -105,8 +105,6 @@ apis:
     url: https://apitracker.io/a/watershedclimate
   - type: Marketplace
     url: https://watershed.com/marketplace
-  - url: graphql/watershed-graphql.md
-    type: GraphQL
   features:
   - name: Activity Data Ingestion
     description: Push activity data (utilities, travel, spend, cloud, supply chain)
